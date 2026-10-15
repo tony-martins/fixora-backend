@@ -1,10 +1,18 @@
 import path from "path";
-import swaggerJSDoc from "swagger-jsdoc";
+import fs from "fs";
 import { fileURLToPath } from "url";
+import swaggerJSDoc from "swagger-jsdoc";
 
-// Get current directory path for ES Modules
+// Create __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Build the route-file pattern
+const routersGlob = path
+  .resolve(__dirname, "../routers/*.js")
+  .replace(/\\/g, "/");
+
+console.log("Swagger glob:", routersGlob);
 
 const options = {
   definition: {
@@ -39,13 +47,22 @@ const options = {
     },
   },
 
-  // 🔥 This dynamically targets the paths relative to this configuration file
-  apis: [
-    path.join(__dirname, "./src/routes/*.js"),
-    path.join(__dirname, "./server.js"),
-  ],
+  apis: [routersGlob],
 };
 
+// Check whether the route files contain Swagger annotations
+for (const file of ["jobRoute.js", "userRoute.js"]) {
+  const filePath = path.join(__dirname, "../routers", file);
+  const source = fs.readFileSync(filePath, "utf8");
+
+  console.log(
+    `${file}:`,
+    source.includes("@swagger") ? "@swagger found" : "@swagger missing",
+  );
+}
+
 const swaggerSpec = swaggerJSDoc(options);
+
+console.log("Swagger paths:", Object.keys(swaggerSpec.paths || {}));
 
 export default swaggerSpec;
