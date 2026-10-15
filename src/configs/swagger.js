@@ -1,4 +1,10 @@
+import path from "path";
 import swaggerJSDoc from "swagger-jsdoc";
+import { fileURLToPath } from "url";
+
+// Get current directory path for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const options = {
   definition: {
@@ -33,7 +39,11 @@ const options = {
     },
   },
 
-  apis: ["src/routes/*.js", "server.js"],
+  // 🔥 This dynamically targets the paths relative to this configuration file
+  apis: [
+    path.join(__dirname, "./src/routes/*.js"),
+    path.join(__dirname, "./server.js"),
+  ],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
