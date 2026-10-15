@@ -1,5 +1,18 @@
 import mongoose from "mongoose";
 
+export const job_categories = [
+  "plumbing",
+  "electrical",
+  "cleaning",
+  "writing",
+  "capentry",
+  "painting",
+  "laundry",
+  "tutoring",
+  "gardening",
+  "other",
+];
+
 const jobSchema = new mongoose.Schema(
   {
     customer: {
@@ -41,9 +54,22 @@ const jobSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["requested", "accepted", "in_progress", "cancel", "awaiting_review", "completed"],
+      enum: [
+        "requested",
+        "accepted",
+        "in_progress",
+        "cancel",
+        "awaiting_review",
+        "completed",
+      ],
       trim: true,
       default: "requested",
+    },
+
+    category: {
+      type: String,
+      required: true,
+      enum: job_categories,
     },
   },
   { timestamps: true },

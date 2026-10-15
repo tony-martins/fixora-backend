@@ -3,9 +3,9 @@ import Job from "../models/jobModel.js";
 // 1. create jobs
 export const createJobs = async (req, res, next) => {
   try {
-    const { service, description, price, location } = req.body;
+    const { service, description, price, location, category } = req.body;
 
-    if (!service || !description || !price || !location) {
+    if (!service || !description || !price || !location || !category) {
       return res
         .status(400)
         .json({ message: "Please fill in all required fields" });
@@ -17,9 +17,45 @@ export const createJobs = async (req, res, next) => {
       description,
       price,
       location,
+      category,
     });
 
     res.status(201).json({ message: "Job created successfully", job: job });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// get job by category
+export const getJobByCategory = async (req, res, next) => {
+  try {
+    const category = req.params.category.toLowerCase();
+
+    const validCategories = Job.schema.path("category").enumValues;
+
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({ message: "invalid job category" });
+    }
+
+    const { page, skip, limit } = req.pagination;
+
+    const jobs = await Job.find({
+      status: "requested",
+      category,
+      provider: null,
+    })
+      .populate("customer", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res
+      .status(200)
+      .json({
+        message: "jobs fetched successfully",
+        jobs,
+        pagination: { limit, page },
+      });
   } catch (error) {
     next(error);
   }
