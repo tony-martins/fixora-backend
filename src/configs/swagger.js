@@ -12,8 +12,6 @@ const routersGlob = path
   .resolve(__dirname, "../routers/*.js")
   .replace(/\\/g, "/");
 
-console.log("Swagger glob:", routersGlob);
-
 const options = {
   definition: {
     openapi: "3.0.0",
@@ -51,18 +49,11 @@ const options = {
 };
 
 // Check whether the route files contain Swagger annotations
-for (const file of ["jobRoute.js", "userRoute.js"]) {
-  const filePath = path.join(__dirname, "../routers", file);
-  const source = fs.readFileSync(filePath, "utf8");
-
-  console.log(
-    `${file}:`,
-    source.includes("@swagger") ? "@swagger found" : "@swagger missing",
-  );
-}
+// for (const file of ["jobRoute.js", "userRoute.js"]) {
+//   const filePath = path.join(__dirname, "../routers", file);
+//   const source = fs.readFileSync(filePath, "utf8");
+// }
 
 const swaggerSpec = swaggerJSDoc(options);
-
-console.log("Swagger paths:", Object.keys(swaggerSpec.paths || {}));
 
 export default swaggerSpec;
