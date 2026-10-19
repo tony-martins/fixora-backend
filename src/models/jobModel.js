@@ -5,7 +5,7 @@ export const job_categories = [
   "electrical",
   "cleaning",
   "writing",
-  "capentry",
+  "carpentry",
   "painting",
   "laundry",
   "tutoring",
