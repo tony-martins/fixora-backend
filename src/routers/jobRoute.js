@@ -1,8 +1,9 @@
-
 import express from "express";
 import {
   acceptJob,
   cancelJob,
+  changeCustomerJobStatus,
+  changeProviderJobStaus,
   createJobs,
   getAvailableJobs,
   getJobByCategory,
@@ -350,5 +351,114 @@ router.patch("/:id/complete", authMiddleware, jobCompleted);
  *         description: Job not found
  */
 router.patch("/:id/cancel", authMiddleware, cancelJob);
+
+/**
+ * @swagger
+ * /api/jobs/{id}/provider-status:
+ *   patch:
+ *     summary: Change a job status as a provider
+ *     description: >
+ *       Allows an authenticated provider to accept an available job,
+ *       start an accepted job, or submit an in-progress job for customer review.
+ *       The provider must be assigned to the job for subsequent transitions.
+ *     tags: [Job Status]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB job ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum:
+ *                   - accepted
+ *                   - in_progress
+ *                   - awaiting_review
+ *                 example: accepted
+ *     responses:
+ *       200:
+ *         description: Job status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/JobResponse'
+ *       400:
+ *         description: Invalid job ID or provider status
+ *       401:
+ *         description: Authentication required
+ *       403:
+ *         description: Only providers or the assigned provider can perform this action
+ *       404:
+ *         description: Job not found
+ *       409:
+ *         description: Job is unavailable or the status transition is invalid
+ */
+router.patch("/:id/provider-status", authMiddleware, changeProviderJobStaus);
+
+/**
+ * @swagger
+ * /api/jobs/{id}/customer-status:
+ *   patch:
+ *     summary: Change a job status as a customer
+ *     description: >
+ *       Allows an authenticated customer to cancel their own requested job
+ *       or confirm completion of their job after it has been submitted
+ *       for review by the provider.
+ *     tags: [Job Status]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB job ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum:
+ *                   - cancelled
+ *                   - completed
+ *                 example: completed
+ *     responses:
+ *       200:
+ *         description: Job status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/JobResponse'
+ *       400:
+ *         description: Invalid job ID or customer status
+ *       401:
+ *         description: Authentication required
+ *       403:
+ *         description: Only the customer who owns the job can update it
+ *       404:
+ *         description: Job not found
+ *       409:
+ *         description: Job is not in the required status for this transition
+ */
+router.patch("/:id/customer-status", authMiddleware, changeCustomerJobStatus);
 
 export default router;

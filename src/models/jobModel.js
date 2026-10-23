@@ -58,7 +58,7 @@ const jobSchema = new mongoose.Schema(
         "requested",
         "accepted",
         "in_progress",
-        "cancel",
+        "cancelled",
         "awaiting_review",
         "completed",
       ],
