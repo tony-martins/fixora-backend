@@ -9,6 +9,7 @@ import {
   getJobByCategory,
   getJobById,
   getMyJobs,
+  getProviderJobs,
   jobCompleted,
   jobInProgress,
   submitJobForReview,
@@ -199,6 +200,37 @@ router.get("/available-jobs/:_id", getJobById);
  *         description: Authentication required
  */
 router.get("/my-jobs/", authMiddleware, getMyJobs);
+
+/**
+ * @swagger
+ * /api/jobs/provider/my-jobs:
+ *   get:
+ *     summary: Get the logged-in provider's jobs
+ *     description: Returns all jobs assigned to the authenticated service provider.
+ *     tags: [Jobs]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Provider jobs retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Provider jobs retrieved successfully
+ *                 jobs:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Job'
+ *       401:
+ *         description: Authentication required
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/provider/my-jobs", authMiddleware, getProviderJobs);
 
 /**
  * @swagger

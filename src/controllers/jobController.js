@@ -112,6 +112,23 @@ export const getMyJobs = async (req, res, next) => {
   }
 };
 
+// get provider jobs
+export const getProviderJobs = async (req, res, next) => {
+  try {
+    const jobs = await Job.find({ provider: req.user._id }).sort({
+      createdAt: -1,
+    });
+
+    res.status(200).json({
+      message: "Provider jobs retrieved successfully",
+      jobs,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 // cancel requested job
 export const cancelJob = async (req, res, next) => {
   try {
